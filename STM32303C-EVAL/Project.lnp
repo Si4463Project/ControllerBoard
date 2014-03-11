@@ -1,0 +1,22 @@
+--cpu Cortex-M4.fp
+".\stm32303c-eval\system_stm32f30x.o"
+".\stm32303c-eval\startup_stm32f30x.o"
+".\stm32303c-eval\stm32f30x_dma.o"
+".\stm32303c-eval\stm32f30x_gpio.o"
+".\stm32303c-eval\stm32f30x_i2c.o"
+".\stm32303c-eval\stm32f30x_misc.o"
+".\stm32303c-eval\stm32f30x_pwr.o"
+".\stm32303c-eval\stm32f30x_rcc.o"
+".\stm32303c-eval\stm32f30x_spi.o"
+".\stm32303c-eval\stm32f30x_syscfg.o"
+".\stm32303c-eval\stm32f30x_tim.o"
+".\stm32303c-eval\stm32f30x_usart.o"
+".\stm32303c-eval\stm32303c_eval.o"
+".\stm32303c-eval\main.o"
+".\stm32303c-eval\stm32f30x_it.o"
+".\stm32303c-eval\tw88.o"
+".\stm32303c-eval\ar1100.o"
+--library_type=microlib --strict --scatter ".\STM32303C-EVAL\Project.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\STM32303C_EVAL\Project.map" -o .\STM32303C-EVAL\Project.axf
