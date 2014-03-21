@@ -30,7 +30,7 @@ uint8_t TW88_Init(void)
 	while (TW88Write(0x07,0x02)==0) {
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}
-	while (TW88Write(0x08,0x15)==0) {
+	while (TW88Write(0x08,0x00)==0) {
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}
 	while (TW88Write(0x09,0xF0)==0) {
@@ -363,7 +363,7 @@ uint8_t TW88_Init(void)
 	while (TW88Write(0xB8,0x04)==0) {
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}	
-	while (TW88Write(0xB9,0x08)==0) {
+	while (TW88Write(0xB9,0x08)==0) {//back porch value
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}	
 	while (TW88Write(0xBA,0xE0)==0) {
@@ -401,7 +401,8 @@ uint8_t TW88_Init(void)
 	while (TW88Write(0xC3,0x00)==0) {
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}
-	while (TW88Write(0xC4,0x40)==0) {
+	while (TW88Write(0xC4,0x99)==0) { // PWM setup and duty cycle default 0x40 
+		// 0xBF - 50% duty cycle - 0x99 - 20% duty cycle
 			I2CReset(I2C1,GPIOB,GPIO_Pin_6,GPIO_Pin_7);
 	}
 	while (TW88Write(0xC6,0x00)==0) {

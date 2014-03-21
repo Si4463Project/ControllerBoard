@@ -117,8 +117,8 @@ void SerialPort_Init(uint32_t speed, uint8_t enable_recvirq)
 int main(void)
 {
 	GPIO_InitTypeDef        GPIO_InitStructure;								//structure for GPIO setup
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;						//structure for TIM Time Base
-	TIM_OCInitTypeDef				TIM_OCInitStructure;							//structure for TIM Output Compare
+	//TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;						//structure for TIM Time Base
+	//TIM_OCInitTypeDef				TIM_OCInitStructure;							//structure for TIM Output Compare
 
 	I2C_InitTypeDef					I2C_InitStructure; 		 	
 	
@@ -148,8 +148,11 @@ int main(void)
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
 	//STM_EVAL_LEDInit(LED7);
-
-
+	
+	
+	
+	// Disable the PWM and Display on from STM32F3 !
+/*
 	//setup the PWM on the Backlight pin
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);				//enable the AHB Peripheral Clock to use GPIOE
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);			//enable the TIM3 clock
@@ -189,7 +192,7 @@ int main(void)
 
   TIM_SetCompare1(TIM4, 40);															//set the default compare value to 5000us
 	TIM_Cmd(TIM4, ENABLE);		
-
+*/
 
 	//init now the TW88 chip on I2C 1
 	
