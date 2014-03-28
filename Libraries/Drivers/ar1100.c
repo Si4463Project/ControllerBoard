@@ -18,7 +18,7 @@ void USART1_IRQHandler(void)
     if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
     {
         /* Read one byte from the receive data register */
-        touch_buffer[touch_counter] = (USART_ReceiveData(USART1) & 0x01FF); //make them 8 bits
+        touch_buffer[touch_counter] = (USART_ReceiveData(USART1) & 0x00FF); //make them 8 bits
 			
 			
 				if (touch_counter==9) {
@@ -158,7 +158,7 @@ void AR1100Init(void)
 		AR1100TouchDisable();
 		Delay(50);
 			
-		//do some dummy reads ! stupid PIC18 internal firmware needs that aparently
+		//do some dummy reads ! stupid PIC18 internal firmware aparently needs that
 			
 		//uint8_t buffer[6]={0,0,0,0,0,0};
 
@@ -185,7 +185,7 @@ uint8_t AR1100_ReadData(uint8_t *buffer, const uint8_t sz)
 	if (sz<=0) return 0;  
 	uint8_t ch,size_read;
 	while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-	ch=(USART_ReceiveData(USART1) & 0x1FF);
+	ch=(USART_ReceiveData(USART1) & 0x00FF);
 	if (ch!=0x55) { 
 		 return 0;
 	} //sync ?
@@ -193,7 +193,7 @@ uint8_t AR1100_ReadData(uint8_t *buffer, const uint8_t sz)
 	while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
 	
 	//now read the size
-	size_read=(USART_ReceiveData(USART1) & 0x1FF);
+	size_read=(USART_ReceiveData(USART1) & 0x00FF);
 		
 	if ((size_read==0) || (size_read>sz)) return 0;
 
@@ -201,7 +201,7 @@ uint8_t AR1100_ReadData(uint8_t *buffer, const uint8_t sz)
 	//size 
 	for (uint8_t x=0;x<size_read;x++) {
 		while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-		ch=(USART_ReceiveData(USART1) & 0x1FF);
+		ch=(USART_ReceiveData(USART1) & 0x00FF);
 		//now copy it into the buffer
 		buffer[x]=ch;	
 	}		
@@ -214,13 +214,13 @@ uint8_t AR1100_ReadData(uint8_t *buffer, const uint8_t sz)
 void AR1100TouchEnable(void)
 {
 	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}		
-  USART_SendData(USART1, (0x1FF)&0x55);
+  USART_SendData(USART1, (0x00FF)&0x55);
   /* Loop until the end of transmission */
   while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	
-  USART_SendData(USART1, (0x1FF)&0x01);
+  USART_SendData(USART1, (0x00FF)&0x01);
   /* Loop until the end of transmission */
   while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}			
-  USART_SendData(USART1,(0x1FF)&0x12);
+  USART_SendData(USART1,(0x00FF)&0x12);
 
 		
 	uint8_t buff[6];
@@ -231,13 +231,13 @@ void AR1100TouchEnable(void)
 void AR1100TouchDisable(void)
 {
 	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	USART_SendData(USART1, (0x1FF)&0x55);
+	USART_SendData(USART1, (0x00FF)&0x55);
 	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	USART_SendData(USART1, (0x1FF)&0x01);
+	USART_SendData(USART1, (0x00FF)&0x01);
 	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	
-	USART_SendData(USART1, (0x1FF)&0x13);
+	USART_SendData(USART1, (0x00FF)&0x13);
 		
-	//now read the data or it we will have overruns
+	//now read the data or we will have overruns
 	uint8_t buff[6];
 	AR1100_ReadData(buff,6);
 		
@@ -248,17 +248,17 @@ void AR1100TouchDisable(void)
 void AR1100_WriteReg(uint8_t reg_addr, uint8_t regval)
 {
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&0x55);
+	 USART_SendData(USART1, (0x00FF)&0x55);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&0x03); //this is a problem !
+	 USART_SendData(USART1, (0x00FF)&0x03); //this is a problem !
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&0x21);
+	 USART_SendData(USART1, (0x00FF)&0x21);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	 
-	 USART_SendData(USART1, (0x1FF)&0x00);
+	 USART_SendData(USART1, (0x00FF)&0x00);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	 
-	 USART_SendData(USART1, (0x1FF)&reg_addr);
+	 USART_SendData(USART1, (0x00FF)&reg_addr);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&regval);
+	 USART_SendData(USART1, (0x00FF)&regval);
 
 
 	uint8_t buff[6];
@@ -269,17 +269,17 @@ void AR1100_WriteReg(uint8_t reg_addr, uint8_t regval)
 void AR1100_ReadReg(uint8_t reg_addr, uint8_t *regval)
 {
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	
-	 USART_SendData(USART1, (0x1FF)&0x55);
+	 USART_SendData(USART1, (0x00FF)&0x55);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	
-	 USART_SendData(USART1, (0x1FF)&0x04);
+	 USART_SendData(USART1, (0x00FF)&0x04);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&0x20);
+	 USART_SendData(USART1, (0x00FF)&0x20);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}	
-	 USART_SendData(USART1, (0x1FF)&0x00);
+	 USART_SendData(USART1, (0x00FF)&0x00);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}
-	 USART_SendData(USART1, (0x1FF)&reg_addr);
+	 USART_SendData(USART1, (0x00FF)&reg_addr);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){}		
-	 USART_SendData(USART1, (0x1FF)&0x01);	
+	 USART_SendData(USART1, (0x00FF)&0x01);	
 	 
 	 //now read the data
 	 
@@ -288,15 +288,15 @@ void AR1100_ReadReg(uint8_t reg_addr, uint8_t *regval)
 	 
 	 uint8_t ch[6]={0,0,0,0,0,0};
 		 
-	 ch[0]=(USART_ReceiveData(USART1) & 0x1FF);
+	 ch[0]=(USART_ReceiveData(USART1) & 0x00FF);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-	 ch[1]=(USART_ReceiveData(USART1) & 0x1FF); 
+	 ch[1]=(USART_ReceiveData(USART1) & 0x00FF); 
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-	 ch[2]=(USART_ReceiveData(USART1) & 0x1FF); 
+	 ch[2]=(USART_ReceiveData(USART1) & 0x00FF); 
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-	 ch[3]=(USART_ReceiveData(USART1) & 0x1FF);
+	 ch[3]=(USART_ReceiveData(USART1) & 0x00FF);
 	 while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) {}
-	 ch[4]=(USART_ReceiveData(USART1) & 0x1FF);	 
+	 ch[4]=(USART_ReceiveData(USART1) & 0x00FF);	 
 	 
 	 *regval=ch[4];
 	 
