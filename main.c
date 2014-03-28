@@ -1,6 +1,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "tw88.h"
+#include "ar1100.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -11,7 +12,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
-static __IO uint32_t TimingDelay;
+
 RCC_ClocksTypeDef RCC_Clocks;
 
 uint8_t rx_buffer[RX_BUFFER_LENGTH];
@@ -20,6 +21,17 @@ uint8_t rx_counter = 0;
 
 void SerialPort_Init(uint32_t speed, uint8_t enable_recvirq);
 uint8_t USART2_ReadChar(void);
+volatile TouchCoords touch_coords;
+
+void onTouchScreenEvent(TouchCoords coords);
+
+
+
+
+
+
+
+
 
 
 
@@ -113,31 +125,38 @@ void SerialPort_Init(uint32_t speed, uint8_t enable_recvirq)
 }
 
 
+void onTouchScreenEvent(TouchCoords coords)
+{
+	  //here we will receive complete touch screen events 
+		
+	printf("Received Tocuh event: X = %d Y=%d Pen state: %d \r\n",coords.x,coords.y,coords.p);
+	STM_EVAL_LEDToggle(LED4);
+	
+}
+
+
+
+
+
+
+
+
+
 
 int main(void)
 {
 	GPIO_InitTypeDef        GPIO_InitStructure;								//structure for GPIO setup
-	//TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;						//structure for TIM Time Base
-	//TIM_OCInitTypeDef				TIM_OCInitStructure;							//structure for TIM Output Compare
-
+	//TouchInitStr touch_init;
+	
 	I2C_InitTypeDef					I2C_InitStructure; 		 	
 	
-	//uint8_t ReadRegister;
 
-	
-	
-  /*!< At this stage the microcontroller clock setting is already configured, 
-       this is done through SystemInit() function which is called from startup
-       file (startup_stm32f30x.s) before to branch to application main.
-       To reconfigure the default setting of SystemInit() function, refer to
-       system_stm32f30x.c file
-     */ 
   /* SysTick end of count event each 1ms */
   RCC_GetClocksFreq(&RCC_Clocks);
   SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);	
 	
-
-	
+ 
+	touch_coords.processed=1;
 	
 	
 
@@ -147,52 +166,9 @@ int main(void)
   STM_EVAL_LEDInit(LED2);
   STM_EVAL_LEDInit(LED3);
   STM_EVAL_LEDInit(LED4);
-	//STM_EVAL_LEDInit(LED7);
 	
+	STM_EVAL_LEDInit(LED9);
 	
-	
-	// Disable the PWM and Display on from STM32F3 !
-/*
-	//setup the PWM on the Backlight pin
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);				//enable the AHB Peripheral Clock to use GPIOE
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);			//enable the TIM3 clock
-	
-	
-	GPIO_StructInit(&GPIO_InitStructure);
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;							
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;									
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;								
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;							
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;						
-  GPIO_Init(GPIOD, &GPIO_InitStructure);	
-	
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_2);			//connect the pin to the desired peripherals' Alternate Function (AF) - TIM2 (GPIO_AF_1)
-	
-// setup the PD13 to be a BL _on
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;							
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;									
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;								
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;							
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;						
-  GPIO_Init(GPIOD, &GPIO_InitStructure);	
-
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_1);	
-	GPIO_WriteBit(GPIOD,GPIO_Pin_13,Bit_SET);
-
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Prescaler = 71;									//configure timer to create 50Hz signal 			
-	TIM_TimeBaseStructure.TIM_Period = 100;									
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-	
-	TIM_OCStructInit(&TIM_OCInitStructure);
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;					//PWM mode configuration
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
-
-  TIM_SetCompare1(TIM4, 40);															//set the default compare value to 5000us
-	TIM_Cmd(TIM4, ENABLE);		
-*/
 
 	//init now the TW88 chip on I2C 1
 	
@@ -256,6 +232,9 @@ int main(void)
 	TW88_AddOSD_Win(0,0,0x3F,1);
 	
 	
+	//touch_init.onTouchEvent = onTouchScreenEvent;
+	AR1100Init();
+	
 	
 	
   /* Infinite loop */
@@ -267,6 +246,13 @@ int main(void)
 			memset(rx_buffer, 0, RX_BUFFER_LENGTH);
 			rx_counter=0;
 		}
+		
+		
+		if (touch_coords.processed==0) {
+			 touch_coords.processed=1;
+			 onTouchScreenEvent(touch_coords);
+		}
+		
 		
     /* Toggle LD1 */
     STM_EVAL_LEDToggle(LED1);
@@ -287,10 +273,10 @@ int main(void)
     Delay(50);
 
     /* Toggle LD4 */
-    STM_EVAL_LEDToggle(LED4);
+    //STM_EVAL_LEDToggle(LED4);
 
     /* Insert 50 ms delay */
-    Delay(50);
+    //Delay(50);
 		
 
 		
@@ -300,26 +286,6 @@ int main(void)
 
 
 
-
-void Delay(__IO uint32_t nTime)
-{
-  TimingDelay = nTime;
-
-  while(TimingDelay != 0);
-}
-
-/**
-  * @brief  Decrements the TimingDelay variable.
-  * @param  None
-  * @retval None
-  */
-void TimingDelay_Decrement(void)
-{
-  if (TimingDelay != 0x00)
-  { 
-    TimingDelay--;
-  }
-}
 
 
 

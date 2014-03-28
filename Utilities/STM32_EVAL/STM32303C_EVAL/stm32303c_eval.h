@@ -66,7 +66,8 @@ typedef enum
   LED1 = 0,
   LED2 = 1,
   LED3 = 2,
-  LED4 = 3
+  LED4 = 3,
+	LED9 = 4
 } Led_TypeDef;
 
 typedef enum 
@@ -137,6 +138,12 @@ typedef enum
 #define LED4_PIN                         GPIO_Pin_11
 #define LED4_GPIO_PORT                   GPIOE
 #define LED4_GPIO_CLK                    RCC_AHBPeriph_GPIOE
+
+
+#define LED9_PIN                         GPIO_Pin_12
+#define LED4_GPIO_PORT                   GPIOE
+#define LED4_GPIO_CLK                    RCC_AHBPeriph_GPIOE
+
 
 /**
   * @}
@@ -361,6 +368,9 @@ typedef enum
   * @}
   */
 
+
+static __IO uint32_t TimingDelay;
+
 /** @defgroup STM32303C_EVAL_LOW_LEVEL_Exported_Functions
   * @{
   */
@@ -381,7 +391,8 @@ void sEE_I2C_LowLevel_Init(void);
 
 int fputc(int ch, FILE *f);
 
-
+void TimingDelay_Decrement(void);
+void Delay(__IO uint32_t nTime);
 
 
 
